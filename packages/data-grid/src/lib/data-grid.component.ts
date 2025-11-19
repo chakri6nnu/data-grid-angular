@@ -416,6 +416,13 @@ export class DataGridComponent<T = unknown>
       );
       this.syncFilterValues();
       this.cdr.detectChanges();
+      
+      // Trigger row animation if pending
+      if (this.isAnimating) {
+        setTimeout(() => {
+          this.handleRowAnimation();
+        }, 0);
+      }
     }
   }
 
@@ -645,14 +652,22 @@ export class DataGridComponent<T = unknown>
       );
     }
 
-    if (this.animateRows !== false && this.grid && newDirection !== null) {
+    if (this.animateRows !== false && this.grid && newDirection !== null && this.bodyRef?.nativeElement) {
       const currentRows = this.gridService.getRows<T>(this.gridId);
       const positions = new Map<number, number>();
       const topPositions = new Map<number, number>();
 
+      // Query DOM elements directly
+      const bodyElement = this.bodyRef.nativeElement;
+      const rowElements = bodyElement.querySelectorAll(
+        '[data-row-index]'
+      ) as NodeListOf<HTMLElement>;
+
       currentRows.forEach((row, sortedIndex) => {
         positions.set(row.index, sortedIndex);
-        const rowEl = this.rowRefs.get(row.index);
+        const rowEl = Array.from(rowElements).find(
+          (el) => el.getAttribute('data-row-index') === String(row.index)
+        );
         if (rowEl) {
           topPositions.set(row.index, rowEl.offsetTop);
         } else {
@@ -675,6 +690,35 @@ export class DataGridComponent<T = unknown>
   ): void {
     this.filterOperators.set(columnId, operator);
 
+    // Capture current row positions for animation
+    if (this.animateRows !== false && this.grid && this.bodyRef?.nativeElement) {
+      const currentRows = this.gridService.getRows<T>(this.gridId);
+      const positions = new Map<number, number>();
+      const topPositions = new Map<number, number>();
+
+      // Query DOM elements directly
+      const bodyElement = this.bodyRef.nativeElement;
+      const rowElements = bodyElement.querySelectorAll(
+        '[data-row-index]'
+      ) as NodeListOf<HTMLElement>;
+
+      currentRows.forEach((row, sortedIndex) => {
+        positions.set(row.index, sortedIndex);
+        const rowEl = Array.from(rowElements).find(
+          (el) => el.getAttribute('data-row-index') === String(row.index)
+        );
+        if (rowEl) {
+          topPositions.set(row.index, rowEl.offsetTop);
+        } else {
+          topPositions.set(row.index, sortedIndex * this.rowHeight);
+        }
+      });
+
+      this.pendingAnimation = positions;
+      this.pendingTopPositions = topPositions;
+      this.isAnimating = true;
+    }
+
     const currentValue = this.filterValues.get(columnId) || "";
     if (currentValue.trim() !== "" && this.grid) {
       const condition: FilterCondition = {
@@ -694,6 +738,35 @@ export class DataGridComponent<T = unknown>
     this.filterValues.set(columnId, value);
 
     if (!this.grid) return;
+
+    // Capture current row positions for animation
+    if (this.animateRows !== false && this.grid && this.bodyRef?.nativeElement) {
+      const currentRows = this.gridService.getRows<T>(this.gridId);
+      const positions = new Map<number, number>();
+      const topPositions = new Map<number, number>();
+
+      // Query DOM elements directly
+      const bodyElement = this.bodyRef.nativeElement;
+      const rowElements = bodyElement.querySelectorAll(
+        '[data-row-index]'
+      ) as NodeListOf<HTMLElement>;
+
+      currentRows.forEach((row, sortedIndex) => {
+        positions.set(row.index, sortedIndex);
+        const rowEl = Array.from(rowElements).find(
+          (el) => el.getAttribute('data-row-index') === String(row.index)
+        );
+        if (rowEl) {
+          topPositions.set(row.index, rowEl.offsetTop);
+        } else {
+          topPositions.set(row.index, sortedIndex * this.rowHeight);
+        }
+      });
+
+      this.pendingAnimation = positions;
+      this.pendingTopPositions = topPositions;
+      this.isAnimating = true;
+    }
 
     let condition: FilterCondition | null = null;
 
@@ -731,6 +804,35 @@ export class DataGridComponent<T = unknown>
   }
 
   handleFilterClear(columnId: string): void {
+    // Capture current row positions for animation
+    if (this.animateRows !== false && this.grid && this.bodyRef?.nativeElement) {
+      const currentRows = this.gridService.getRows<T>(this.gridId);
+      const positions = new Map<number, number>();
+      const topPositions = new Map<number, number>();
+
+      // Query DOM elements directly
+      const bodyElement = this.bodyRef.nativeElement;
+      const rowElements = bodyElement.querySelectorAll(
+        '[data-row-index]'
+      ) as NodeListOf<HTMLElement>;
+
+      currentRows.forEach((row, sortedIndex) => {
+        positions.set(row.index, sortedIndex);
+        const rowEl = Array.from(rowElements).find(
+          (el) => el.getAttribute('data-row-index') === String(row.index)
+        );
+        if (rowEl) {
+          topPositions.set(row.index, rowEl.offsetTop);
+        } else {
+          topPositions.set(row.index, sortedIndex * this.rowHeight);
+        }
+      });
+
+      this.pendingAnimation = positions;
+      this.pendingTopPositions = topPositions;
+      this.isAnimating = true;
+    }
+
     this.filterValues.delete(columnId);
     this.filterOperators.delete(columnId);
     this.activeFilters.delete(columnId);
@@ -1831,7 +1933,8 @@ export class DataGridComponent<T = unknown>
       this.pendingAnimation &&
       this.pendingTopPositions &&
       this.isAnimating &&
-      this.grid
+      this.grid &&
+      this.bodyRef?.nativeElement
     ) {
       setTimeout(() => {
         requestAnimationFrame(() => {
@@ -1842,9 +1945,18 @@ export class DataGridComponent<T = unknown>
               newPositions.set(row.index, sortedIndex);
             });
 
-            this.rowRefs.forEach((el, rowDataIndex) => {
+            // Query DOM elements directly using data-row-index
+            const bodyElement = this.bodyRef.nativeElement;
+            const rowElements = bodyElement.querySelectorAll(
+              '[data-row-index]'
+            ) as NodeListOf<HTMLElement>;
+
+            rowElements.forEach((el) => {
+              const rowDataIndex = parseInt(
+                el.getAttribute('data-row-index') || '0',
+                10
+              );
               if (
-                el &&
                 this.pendingAnimation!.has(rowDataIndex) &&
                 newPositions.has(rowDataIndex) &&
                 this.pendingTopPositions!.has(rowDataIndex)
@@ -1855,10 +1967,11 @@ export class DataGridComponent<T = unknown>
                 const offset = oldTop - newTop;
 
                 if (Math.abs(offset) > 0.1) {
+                  el.style.transition = 'transform 0.4s cubic-bezier(0.4, 0, 0.2, 1), opacity 0.3s ease';
                   el.style.transform = `translateY(${offset}px)`;
-                  void el.offsetHeight;
+                  void el.offsetHeight; // Force reflow
                   requestAnimationFrame(() => {
-                    el.style.transform = "translateY(0)";
+                    el.style.transform = 'translateY(0)';
                   });
                 }
               }
@@ -1871,10 +1984,11 @@ export class DataGridComponent<T = unknown>
             this.pendingTopPositions = null;
 
             setTimeout(() => {
-              this.rowRefs.forEach((el) => {
+              rowElements.forEach((el) => {
                 if (el) {
-                  el.style.transform = "";
-                  el.style.opacity = "";
+                  el.style.transform = '';
+                  el.style.opacity = '';
+                  el.style.transition = '';
                 }
               });
               this.isAnimating = false;

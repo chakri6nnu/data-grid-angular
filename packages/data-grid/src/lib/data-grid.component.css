@@ -1167,11 +1167,47 @@
 
 /* Row Animation Styles */
 .data-grid-row-animation .data-grid-row {
-  transition: transform 0.4s, top 0.4s, opacity 0.2s;
+  transition: transform 0.4s cubic-bezier(0.4, 0, 0.2, 1), 
+              top 0.4s cubic-bezier(0.4, 0, 0.2, 1), 
+              opacity 0.3s ease,
+              background-color 0.2s ease;
+  will-change: transform, top;
 }
 
 .data-grid-row-no-animation .data-grid-row {
   transition: none;
+}
+
+/* Smooth fade-in for newly appearing rows */
+.data-grid-row-animation .data-grid-row[data-row-index] {
+  animation: fadeInRow 0.3s ease-out;
+}
+
+@keyframes fadeInRow {
+  from {
+    opacity: 0;
+    transform: translateY(-10px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+/* Smooth fade-out for disappearing rows (when filtering) */
+.data-grid-row-animation .data-grid-row.animating-out {
+  animation: fadeOutRow 0.2s ease-in forwards;
+}
+
+@keyframes fadeOutRow {
+  from {
+    opacity: 1;
+    transform: translateY(0);
+  }
+  to {
+    opacity: 0;
+    transform: translateY(-10px);
+  }
 }
 
 /* Flex column support */

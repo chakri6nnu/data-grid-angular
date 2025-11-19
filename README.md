@@ -10,8 +10,6 @@
 [![Angular](https://img.shields.io/badge/Angular-19-red.svg)](https://angular.io/)
 [![TypeScript](https://img.shields.io/badge/TypeScript-5.5-blue.svg)](https://www.typescriptlang.org/)
 
-**Author:** Chakravarthi Chennu
-
 </div>
 
 ---

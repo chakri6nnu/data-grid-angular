@@ -1,0 +1,42 @@
+{
+  "name": "data-grid",
+  "version": "1.0.0",
+  "description": "Advanced grid library with Angular wrapper built with TypeScript",
+  "author": "Chakravarthi Chennu",
+  "main": "dist/data-grid/fesm2022/data-grid.mjs",
+  "types": "dist/data-grid/index.d.ts",
+  "files": [
+    "dist"
+  ],
+  "keywords": [
+    "grid",
+    "table",
+    "data-grid",
+    "angular",
+    "angular19",
+    "typescript",
+    "virtual-scrolling",
+    "sorting",
+    "filtering",
+    "pagination",
+    "grouping",
+    "row-selection",
+    "cell-editing",
+    "column-resize"
+  ],
+  "license": "MIT",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/chakravarthichennu/angular-grid.git"
+  },
+  "bugs": {
+    "url": "https://github.com/chakravarthichennu/angular-grid/issues"
+  },
+  "homepage": "https://github.com/chakravarthichennu/angular-grid#readme",
+  "peerDependencies": {
+    "@angular/core": "^19.0.0",
+    "@angular/common": "^19.0.0",
+    "@angular/forms": "^19.0.0",
+    "rxjs": "^7.0.0"
+  }
+}

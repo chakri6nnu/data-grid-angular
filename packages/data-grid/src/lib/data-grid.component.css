@@ -1,0 +1,1184 @@
+/* Data Grid Base Styles - Based on Angular  */
+.data-grid {
+  font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto,
+    "Oxygen-Sans", "Ubuntu", "Cantarell", "Helvetica Neue", sans-serif;
+  font-size: 14px;
+  display: flex;
+  flex-direction: column;
+  position: relative;
+  overflow: hidden;
+  border: 1px solid var(--data-border-primary);
+  border-radius: 10px;
+}
+
+/* Light Theme Variables - Based on Angular*/
+.data-grid.data-grid-theme-light {
+  --data-bg-primary: #ffffff;
+  --data-bg-secondary: rgba(24, 29, 31, 0.02); /* chromeBackgroundColor */
+  --data-bg-tertiary: rgba(24, 29, 31, 0.05);
+  --data-bg-hover: rgba(33, 150, 243, 0.08); /* rowHoverColor */
+  --data-bg-selected: rgba(33, 150, 243, 0.2); /* selectedRowBackgroundColor */
+  --data-bg-header: rgba(24, 29, 31, 0.02); /* chromeBackgroundColor */
+  --data-bg-pagination: rgba(24, 29, 31, 0.02);
+  --data-text-primary: #181d1f; /* foregroundColor */
+  --data-text-secondary: rgba(24, 29, 31, 0.5); /* subtleTextColor */
+  --data-text-disabled: rgba(24, 29, 31, 0.3);
+  --data-border-primary: rgba(24, 29, 31, 0.15); /* borderColor */
+  --data-border-secondary: rgba(24, 29, 31, 0.1);
+  --data-border-hover: #2196f3; /* accentColor */
+  --data-accent: #2196f3; /* accentColor */
+  --data-accent-hover: #1976d2;
+  --data-accent-light: rgba(33, 150, 243, 0.1);
+}
+
+/* Dark Theme Variables - Based on Angular Quartz Dark Theme */
+.data-grid.data-grid-theme-dark {
+  --data-bg-primary: hsl(217, 0%, 17%); /* backgroundColor */
+  --data-bg-secondary: rgba(255, 255, 255, 0.05); /* chromeBackgroundColor */
+  --data-bg-tertiary: rgba(255, 255, 255, 0.1);
+  --data-bg-hover: rgba(33, 150, 243, 0.15); /* rowHoverColor */
+  --data-bg-selected: rgba(33, 150, 243, 0.2); /* selectedRowBackgroundColor */
+  --data-bg-header: rgba(255, 255, 255, 0.05); /* chromeBackgroundColor */
+  --data-bg-pagination: rgba(255, 255, 255, 0.05);
+  --data-text-primary: #ffffff; /* foregroundColor */
+  --data-text-secondary: rgba(255, 255, 255, 0.6); /* subtleTextColor */
+  --data-text-disabled: rgba(255, 255, 255, 0.4);
+  --data-border-primary: rgba(255, 255, 255, 0.15); /* borderColor */
+  --data-border-secondary: rgba(255, 255, 255, 0.1);
+  --data-border-hover: #2196f3; /* accentColor */
+  --data-accent: #2196f3; /* accentColor */
+  --data-accent-hover: #42a5f5;
+  --data-accent-light: rgba(33, 150, 243, 0.2);
+}
+
+/* Default to dark theme if no theme specified - Based on Angular Quartz Dark Theme */
+.data-grid:not(.data-grid-theme-light):not(.data-grid-theme-dark) {
+  --data-bg-primary: hsl(217, 0%, 17%);
+  --data-bg-secondary: rgba(255, 255, 255, 0.05);
+  --data-bg-tertiary: rgba(255, 255, 255, 0.1);
+  --data-bg-hover: rgba(33, 150, 243, 0.15);
+  --data-bg-selected: rgba(33, 150, 243, 0.2);
+  --data-bg-header: rgba(255, 255, 255, 0.05);
+  --data-bg-pagination: rgba(255, 255, 255, 0.05);
+  --data-text-primary: #ffffff;
+  --data-text-secondary: rgba(255, 255, 255, 0.6);
+  --data-text-disabled: rgba(255, 255, 255, 0.4);
+  --data-border-primary: rgba(255, 255, 255, 0.15);
+  --data-border-secondary: rgba(255, 255, 255, 0.1);
+  --data-border-hover: #2196f3;
+  --data-accent: #2196f3;
+  --data-accent-hover: #42a5f5;
+  --data-accent-light: rgba(33, 150, 243, 0.2);
+}
+
+/* Grid Container */
+.data-grid {
+  background-color: var(--data-bg-primary);
+  color: var(--data-text-primary);
+}
+
+/* Header */
+.data-grid-header {
+  background-color: white;
+  border-top: 1px solid var(--data-border-primary);
+  border-bottom: 1px solid var(--data-border-primary);
+  color: var(--data-text-primary);
+  font-weight: 600;
+  font-size: 14px;
+  overflow-x: hidden;
+  overflow-y: visible;
+  position: relative;
+  z-index: 100; /* Stay above rows */
+  /* Prevent horizontal scrolling in header */
+  max-width: 100%;
+  /* Allow popovers to overflow vertically but not horizontally */
+  overflow: visible;
+  overflow-x: hidden;
+}
+
+.data-grid-header-row {
+  display: flex;
+  height: 100%;
+  position: relative;
+  min-width: 100%;
+  z-index: 1;
+}
+
+/* Header Cell */
+.data-grid-header-cell {
+  color: var(--data-text-primary);
+  display: flex;
+  flex-direction: column;
+  font-weight: 600;
+  overflow: visible;
+  padding: 0;
+  position: relative;
+  user-select: none;
+  box-sizing: border-box;
+}
+
+/* Small border between header columns */
+.data-grid-header-cell:not(:last-child)::after {
+  content: "";
+  position: absolute;
+  right: 0;
+  top: 20%;
+  bottom: 20%;
+  width: 1px;
+  background-color: var(--data-border-primary);
+  z-index: 1;
+}
+
+/* Ensure checkbox column border is visible and doesn't overlap */
+.data-grid-header-cell:has(.data-grid-header-content-checkbox)::after {
+  z-index: 6;
+}
+
+.data-grid-header-cell:hover {
+  background-color: transparent;
+}
+
+.data-grid-header-cell::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  background-color: transparent;
+  transition: background-color 0.2s;
+  pointer-events: none;
+}
+
+.data-grid-header-cell:hover::before {
+  background-color: transparent;
+}
+
+.data-grid-header-cell.data-grid-header-cell-sortable {
+  /* cursor: pointer; removed - only checkbox should show pointer */
+}
+
+.data-grid-header-cell.data-grid-header-cell-pinned-left {
+  position: sticky;
+  left: 0;
+  z-index: 5;
+  background-color: var(--data-bg-header);
+}
+
+.data-grid-header-cell.data-grid-header-cell-pinned-right {
+  position: sticky;
+  z-index: 5;
+}
+
+/* Remove background highlight - using dots indicator instead */
+.data-grid-header-cell.data-grid-header-cell-filtered {
+  /* Background highlight removed - using dots indicator */
+}
+
+.data-grid-header-cell.data-grid-header-cell-grouped {
+  /* Background highlight removed - using dots indicator */
+}
+
+/* Active indicator dots for grouped/sorted/filtered columns */
+.data-grid-header-active-indicator {
+  display: inline-flex;
+  align-items: center;
+  gap: 3px;
+  margin-left: auto;
+  vertical-align: middle;
+  position: absolute;
+  right: 8px;
+  top: 4px;
+}
+
+.data-grid-header-dot {
+  width: 4px;
+  height: 4px;
+  border-radius: 50%;
+  background-color: var(--data-accent, #4fc3f7);
+  display: inline-block;
+  animation: dotGrow 1.5s ease-in-out infinite;
+}
+
+@keyframes dotGrow {
+  0%,
+  100% {
+    transform: scale(1);
+    opacity: 0.7;
+  }
+  50% {
+    transform: scale(1.3);
+    opacity: 1;
+  }
+}
+
+.data-grid-header-content {
+  align-items: center;
+  display: flex;
+  flex: 1;
+  gap: 6px;
+  padding: 8px 12px;
+  position: relative;
+}
+
+.data-grid-header-text {
+  color: var(--data-text-primary);
+  flex: 1;
+}
+
+.data-grid-filter-indicator {
+  align-items: center;
+  color: var(--data-accent);
+  display: flex;
+  flex-shrink: 0;
+}
+
+.data-grid-group-indicator {
+  align-items: center;
+  color: var(--data-accent);
+  display: flex;
+  flex-shrink: 0;
+}
+
+.data-grid-sort-icon {
+  align-items: center;
+  color: var(--data-text-secondary);
+  display: flex;
+  transition: color 0.2s;
+}
+
+.data-grid-header-cell-sorted .data-grid-sort-icon {
+  color: var(--data-accent);
+}
+
+.data-grid-menu-button {
+  align-items: center;
+  background: transparent;
+  border: none;
+  /* cursor: pointer; removed - only checkbox should show pointer */
+  display: flex;
+  justify-content: center;
+  padding: 2px;
+  color: var(--data-text-secondary);
+  transition: color 0.2s;
+}
+
+.data-grid-menu-button:hover {
+  color: var(--data-accent);
+}
+
+.data-grid-resize-handle {
+  background: transparent;
+  cursor: col-resize;
+  height: 100%;
+  position: absolute;
+  right: -2px;
+  top: 0;
+  width: 8px;
+  z-index: 20;
+  transition: background-color 0.2s;
+}
+
+.data-grid-resize-handle:hover {
+  background-color: var(--data-accent);
+  opacity: 0.5;
+}
+
+.data-grid-header-cell:hover .data-grid-resize-handle {
+  background-color: var(--data-accent);
+  opacity: 0.3;
+}
+
+/* Column Menu Popover */
+.data-grid-menu-popover {
+  background-color: var(--data-bg-primary);
+  border: 1px solid var(--data-border-primary);
+  border-radius: 6px;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15), 0 2px 4px rgba(0, 0, 0, 0.1);
+  min-width: 220px;
+  padding: 4px 0;
+  pointer-events: auto;
+  position: absolute;
+  top: 0;
+  left: 0;
+  z-index: 1000;
+  overflow: hidden;
+  /* Positioned relative to grid container, not header */
+}
+
+.data-grid-menu-section {
+  border-bottom: 1px solid var(--data-border-primary);
+  padding: 0;
+}
+
+.data-grid-menu-section:last-child {
+  border-bottom: none;
+}
+
+.data-grid-menu-section-content {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  padding: 8px 12px;
+}
+
+.data-grid-menu-label {
+  color: var(--data-text-secondary);
+  display: block;
+  font-size: 11px;
+  font-weight: 600;
+  letter-spacing: 0.5px;
+  margin: 0;
+  text-transform: uppercase;
+  user-select: none;
+}
+
+.data-grid-menu-button-item {
+  align-items: center;
+  background: transparent;
+  border: none;
+  border-radius: 3px;
+  /* cursor: pointer; removed - only checkbox should show pointer */
+  display: flex;
+  gap: 8px;
+  padding: 6px 8px;
+  text-align: left;
+  width: 100%;
+  color: var(--data-text-primary);
+  font-size: 13px;
+  transition: all 0.15s ease;
+  margin: 0;
+}
+
+.data-grid-menu-button-item:hover {
+  background-color: var(--data-bg-hover);
+}
+
+.data-grid-menu-button-item:active {
+  background-color: var(--data-bg-hover);
+  transform: scale(0.98);
+}
+
+.data-grid-menu-button-item.data-grid-menu-button-item-active {
+  color: var(--data-accent);
+  background-color: rgba(79, 195, 247, 0.1);
+}
+
+.data-grid-menu-button-item.data-grid-menu-button-item-active:hover {
+  background-color: rgba(79, 195, 247, 0.15);
+}
+
+/* Filter Input */
+.data-grid-filter-section {
+  border-top: 1px solid var(--data-border-primary);
+  padding: 8px 12px;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.data-grid-filter-operator-wrapper {
+  width: 100%;
+}
+
+.data-grid-filter-operator-select {
+  background-color: var(--data-bg-primary);
+  border: 1px solid var(--data-border-primary);
+  border-radius: 4px;
+  color: var(--data-text-primary);
+  cursor: pointer;
+  font-size: 12px;
+  outline: none;
+  padding: 4px 8px;
+  width: 100%;
+}
+
+.data-grid-filter-operator-select:hover {
+  border-color: var(--data-accent);
+}
+
+.data-grid-filter-operator-select:focus {
+  border-color: var(--data-accent);
+  box-shadow: 0 0 0 2px rgba(79, 195, 247, 0.2);
+}
+
+.data-grid-filter-input-wrapper {
+  position: relative;
+  width: 100%;
+}
+
+.data-grid-filter-input {
+  background-color: var(--data-bg-primary);
+  border: 1px solid var(--data-border-primary);
+  border-radius: 4px;
+  color: var(--data-text-primary);
+  font-size: 12px;
+  outline: none;
+  padding: 4px 32px 4px 8px;
+  width: 100%;
+  pointer-events: auto;
+  z-index: 1;
+  position: relative;
+}
+
+.data-grid-filter-input:focus {
+  border-color: var(--data-accent);
+  box-shadow: 0 0 0 2px rgba(79, 195, 247, 0.2);
+  outline: none;
+}
+
+.data-grid-filter-input:focus-visible {
+  outline: none;
+}
+
+.data-grid-filter-clear {
+  background: transparent;
+  border: none;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 2px;
+  position: absolute;
+  right: 8px;
+  top: 50%;
+  transform: translateY(-50%);
+  color: var(--data-text-secondary);
+  width: 20px;
+  height: 20px;
+}
+
+.data-grid-filter-clear:hover {
+  color: var(--data-accent);
+  background-color: var(--data-bg-hover);
+  border-radius: 2px;
+}
+
+/* Body */
+.data-grid-body {
+  flex: 1;
+  overflow: auto;
+  position: relative;
+  z-index: 1; /* Below header */
+  /* Body starts after sticky header - no padding needed as header is sticky */
+}
+
+.data-grid-body-container {
+  background-color: var(--data-bg-primary);
+  position: relative;
+  min-width: 100%;
+  /* Padding-top accounts for sticky header height so rows start below it */
+  /* Rows are positioned absolutely with top offset including headerHeight */
+}
+
+/* Row */
+.data-grid-row {
+  background-color: var(--data-bg-primary);
+  border-bottom: 1px solid var(--data-border-secondary);
+  color: var(--data-text-primary);
+  /* cursor: pointer; removed - only checkbox should show pointer */
+  display: flex;
+  position: absolute;
+  z-index: 1; /* Below header */
+  border-right: none;
+  min-width: 100%;
+}
+
+.data-grid-row:hover {
+  background-color: var(--data-bg-hover);
+}
+
+.data-grid-row.data-grid-row-selected {
+  background-color: var(--data-bg-selected) !important;
+}
+
+.data-grid-row.data-grid-row-highlighted {
+  background-color: var(--data-bg-tertiary);
+}
+
+/* Group Row */
+.data-grid-group-row {
+  background-color: var(--data-bg-secondary);
+  border-bottom: 1px solid var(--data-border-primary);
+  /* cursor: pointer; removed - only checkbox should show pointer */
+  display: flex;
+  font-weight: 600;
+  position: absolute;
+  z-index: 1; /* Below header */
+  border-right: none;
+  align-items: center;
+  min-width: 100%;
+}
+
+.data-grid-group-row:hover {
+  background-color: var(--data-bg-hover);
+}
+
+/* Level-specific styles for nested groups */
+.data-grid-group-level-0 {
+  /* Root level groups */
+}
+
+.data-grid-group-level-1 {
+  /* First nested level - slightly darker background to show nesting */
+  background-color: rgba(33, 150, 243, 0.03);
+}
+
+.data-grid-group-level-2 {
+  /* Second nested level - more visible background */
+  background-color: rgba(33, 150, 243, 0.06);
+}
+
+.data-grid-group-level-3 {
+  /* Third nested level - even more visible */
+  background-color: rgba(33, 150, 243, 0.09);
+}
+
+.data-grid-group-level-4,
+.data-grid-group-level-5,
+.data-grid-group-level-6 {
+  /* Additional nested levels */
+  background-color: rgba(33, 150, 243, 0.12);
+}
+
+.data-grid-group-indent {
+  flex-shrink: 0;
+  min-width: 0;
+  display: inline-block;
+  height: 100%;
+  /* Ensure the indent spacer is visible and takes up space */
+}
+
+.data-grid-group-toggle {
+  align-items: center;
+  /* cursor: pointer; removed - only checkbox should show pointer */
+  display: inline-flex;
+  flex-shrink: 0;
+  justify-content: center;
+  padding: 0 8px;
+  user-select: none;
+  min-width: 24px;
+  height: 100%;
+  color: var(--data-text-primary);
+}
+
+.data-grid-group-toggle:hover {
+  color: var(--data-accent);
+}
+
+.data-grid-group-toggle-icon {
+  color: inherit;
+  transition: transform 0.2s ease;
+  display: inline-block;
+  font-size: 14px;
+  line-height: 1;
+}
+
+.data-grid-group-toggle-icon.data-grid-group-toggle-icon-expanded {
+  transform: rotate(90deg);
+}
+
+.data-grid-group-content {
+  display: flex;
+  align-items: center;
+  flex: 1;
+  overflow: visible;
+  gap: 8px;
+  min-width: 0;
+}
+
+.data-grid-group-label {
+  font-weight: 600;
+  color: var(--data-text-primary);
+  overflow: visible;
+  text-overflow: clip;
+  white-space: nowrap;
+  display: inline-block;
+  min-width: 0;
+  flex-shrink: 0;
+}
+
+.data-grid-group-count {
+  color: var(--data-text-secondary);
+  font-weight: 500;
+  font-size: 13px;
+  flex-shrink: 0;
+}
+
+.data-grid-clear-group-button {
+  flex-shrink: 0;
+  width: 20px;
+  height: 20px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: transparent;
+  border: none;
+  /* cursor: pointer; removed - only checkbox should show pointer */
+  padding: 2px;
+  border-radius: 4px;
+}
+
+.data-grid-clear-group-button:hover {
+  background-color: rgba(0, 0, 0, 0.1);
+}
+
+/* Cell */
+.data-grid-cell {
+  color: var(--data-text-primary);
+  display: flex;
+  align-items: center;
+  overflow: hidden;
+  padding: 0 8px; /* Angular uses cell-horizontal-padding */
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  font-weight: normal;
+  font-size: 14px;
+  height: 100%;
+  box-sizing: border-box;
+}
+
+.data-grid-group-row .data-grid-cell {
+  font-weight: 600;
+}
+
+.data-grid-cell.data-grid-cell-pinned-left {
+  position: sticky;
+  left: 0;
+  z-index: 2; /* Below header */
+}
+
+/* Checkbox Column Header */
+.data-grid-header-cell[data-checkbox-column],
+.data-grid-header-cell:has(.data-grid-header-content-checkbox) {
+  background-color: var(--data-bg-header);
+  overflow: hidden;
+}
+
+.data-grid-header-content-checkbox {
+  max-width: 100%;
+  overflow: hidden;
+  padding: 0 !important; /* Remove padding to prevent checkbox from shifting */
+}
+
+/* Checkbox Styles */
+.data-grid-checkbox {
+  width: 16px;
+  height: 16px;
+  cursor: pointer;
+  accent-color: var(--data-accent);
+  margin: 0;
+  flex-shrink: 0;
+}
+
+.data-grid-checkbox:hover {
+  opacity: 0.8;
+}
+
+.data-grid-checkbox:focus {
+  outline: 2px solid var(--data-accent);
+  outline-offset: 2px;
+}
+
+.data-grid-checkbox:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
+/* Cell Content */
+.data-grid-cell-content {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  width: 100%;
+}
+
+.data-grid-cell-text {
+  flex: 1;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.data-grid-cell-icon {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+  width: 16px;
+  height: 16px;
+}
+
+.data-grid-cell-icon svg {
+  width: 100%;
+  height: 100%;
+}
+
+/* Row Selection Actions */
+.data-grid-selection-actions {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 8px 12px;
+  background-color: var(--data-bg-header);
+  border-bottom: 1px solid var(--data-border-primary);
+  min-height: 40px;
+  position: relative;
+  z-index: 90; /* Below header but above rows */
+}
+
+.data-grid-selection-actions.hidden {
+  display: none;
+}
+
+.data-grid-selection-actions-text {
+  color: var(--data-text-primary);
+  font-size: 14px;
+  font-weight: 500;
+  margin-right: auto;
+}
+
+.data-grid-selection-action-button {
+  padding: 6px 12px;
+  border: 1px solid var(--data-border-primary);
+  background-color: var(--data-bg-primary);
+  color: var(--data-text-primary);
+  border-radius: 4px;
+  /* cursor: pointer; removed - only checkbox should show pointer */
+  font-size: 13px;
+  font-weight: 500;
+  transition: all 0.2s ease;
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+}
+
+.data-grid-selection-action-button:hover {
+  background-color: var(--data-bg-hover);
+  border-color: var(--data-border-hover);
+}
+
+.data-grid-selection-action-button:active {
+  transform: scale(0.98);
+}
+
+.data-grid-selection-action-button.delete {
+  color: #ef4444;
+  border-color: #ef4444;
+}
+
+.data-grid-selection-action-button.delete:hover {
+  background-color: rgba(239, 68, 68, 0.1);
+}
+
+.data-grid-cell.data-grid-cell-pinned-right {
+  position: sticky;
+  right: 0;
+  z-index: 2; /* Below header */
+}
+
+.data-grid-cell-input {
+  background-color: var(--data-bg-secondary);
+  border: 1px solid var(--data-accent);
+  color: var(--data-text-primary);
+  font-size: 13px;
+  outline: none;
+  padding: 4px;
+  width: 100%;
+}
+
+/* Pagination - Angular Material Style */
+.data-grid-pagination {
+  background-color: var(--data-bg-pagination);
+  border-top: 1px solid var(--data-border-primary);
+  color: var(--data-text-primary);
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 8px 16px;
+  font-size: 12px;
+  min-height: 56px;
+}
+
+.data-grid-pagination-page-size {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  margin-right: 32px;
+}
+
+.data-grid-pagination-page-size-label {
+  color: var(--data-text-secondary);
+  font-size: 12px;
+  white-space: nowrap;
+}
+
+.data-grid-pagination-page-size-select {
+  background-color: transparent;
+  border: none;
+  border-bottom: 1px solid var(--data-border-primary);
+  border-radius: 0;
+  color: var(--data-text-primary);
+  /* cursor: pointer; removed - only checkbox should show pointer */
+  font-size: 12px;
+  padding: 4px 0;
+  min-width: 56px;
+  outline: none;
+  transition: border-color 0.2s;
+}
+
+.data-grid-pagination-page-size-select:hover {
+  border-bottom-color: var(--data-accent);
+}
+
+.data-grid-pagination-page-size-select:focus {
+  border-bottom-color: var(--data-accent);
+  border-bottom-width: 2px;
+}
+
+.data-grid-pagination-info {
+  color: var(--data-text-secondary);
+  font-size: 12px;
+  margin: 0 auto;
+  white-space: nowrap;
+}
+
+.data-grid-pagination-nav {
+  display: flex;
+  align-items: center;
+  gap: 0;
+  margin-left: 32px;
+}
+
+.data-grid-pagination-icon-button {
+  background-color: transparent;
+  border: none;
+  border-radius: 50%;
+  color: var(--data-text-primary);
+  /* cursor: pointer; removed - only checkbox should show pointer */
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  height: 40px;
+  width: 40px;
+  padding: 0;
+  margin: 0 4px;
+  transition: background-color 0.2s, color 0.2s;
+  outline: none;
+}
+
+.data-grid-pagination-icon-button:hover:not(:disabled) {
+  background-color: var(--data-bg-hover);
+  color: var(--data-accent);
+}
+
+.data-grid-pagination-icon-button:disabled {
+  opacity: 0.38;
+  cursor: not-allowed;
+}
+
+.data-grid-pagination-icon-button svg {
+  width: 24px;
+  height: 24px;
+}
+
+.data-grid-pagination-page-numbers {
+  display: flex;
+  align-items: center;
+  gap: 0;
+  margin: 0 8px;
+}
+
+.data-grid-pagination-dots {
+  color: var(--data-text-secondary);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 12px;
+  min-width: 40px;
+  height: 40px;
+  padding: 0;
+  margin: 0 2px;
+  user-select: none;
+}
+
+.data-grid-pagination-page-button {
+  background-color: transparent;
+  border: none;
+  border-radius: 50%;
+  color: var(--data-text-primary);
+  /* cursor: pointer; removed - only checkbox should show pointer */
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 12px;
+  font-weight: 500;
+  min-width: 40px;
+  height: 40px;
+  padding: 0;
+  margin: 0 2px;
+  transition: background-color 0.2s, color 0.2s;
+  outline: none;
+}
+
+.data-grid-pagination-page-button:hover {
+  background-color: var(--data-bg-hover);
+}
+
+/* Global Search and Export Container */
+.data-grid-search-export-container {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 10px;
+  margin-top: 10px;
+  margin-bottom: 10px;
+  margin-left: 10px;
+  margin-right: 10px;
+  z-index: 110;
+  position: relative;
+}
+
+/* Global Search */
+.data-grid-global-search {
+  position: relative;
+  z-index: 110; /* Above header and selection actions */
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  background-color: var(--data-bg-primary);
+  border: 1px solid var(--data-border-primary);
+  border-radius: 6px;
+  padding: 6px 10px;
+  padding-left: 12px;
+  width: auto;
+  max-width: 200px;
+}
+
+.data-grid-global-search-left {
+  justify-content: flex-start;
+}
+
+.data-grid-global-search-right {
+  justify-content: flex-end;
+}
+
+.data-grid-global-search-input {
+  border: none;
+  background: transparent;
+  color: var(--data-text-primary);
+  font-size: 14px;
+  padding: 4px 8px;
+  outline: none;
+  min-width: 150px;
+  max-width: 150px;
+  flex: 0 0 150px;
+}
+
+.data-grid-global-search-input::placeholder {
+  color: var(--data-text-secondary);
+}
+
+.data-grid-global-search-clear,
+.data-grid-global-search-export {
+  background: transparent;
+  border: none;
+  color: var(--data-text-secondary);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 4px;
+  border-radius: 4px;
+  transition: all 0.2s;
+  flex-shrink: 0;
+}
+
+.data-grid-global-search-export {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  background-color: var(--data-bg-primary);
+  border: 1px solid var(--data-border-primary);
+  border-radius: 6px;
+  padding: 6px 10px;
+}
+
+.data-grid-column-visibility-dropdown {
+  position: relative;
+  margin-left: auto;
+  margin-right: 10px;
+}
+
+.data-grid-column-visibility-menu {
+  position: absolute;
+  top: 100%;
+  right: 0;
+  margin-top: 4px;
+  background-color: var(--data-bg-primary);
+  border: 1px solid var(--data-border-primary);
+  border-radius: 6px;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15), 0 2px 4px rgba(0, 0, 0, 0.1);
+  min-width: 180px;
+  max-width: 250px;
+  max-height: 300px;
+  overflow-y: auto;
+  z-index: 1000;
+}
+
+.data-grid-column-visibility-header {
+  padding: 10px 12px;
+  font-weight: 600;
+  font-size: 14px;
+  color: var(--data-text-primary);
+  border-bottom: 1px solid var(--data-border-primary);
+  position: sticky;
+  top: 0;
+  background-color: var(--data-bg-primary);
+  z-index: 1;
+}
+
+.data-grid-column-visibility-item {
+  padding: 0;
+}
+
+.data-grid-column-visibility-checkbox {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 8px 12px;
+  cursor: pointer;
+  transition: background-color 0.2s;
+  width: 100%;
+  margin: 0;
+}
+
+.data-grid-column-visibility-checkbox:hover {
+  background-color: var(--data-bg-hover);
+}
+
+.data-grid-column-visibility-checkbox input[type="checkbox"] {
+  width: 16px;
+  height: 16px;
+  cursor: pointer;
+  accent-color: var(--data-accent);
+  margin: 0;
+  flex-shrink: 0;
+}
+
+.data-grid-column-visibility-checkbox span {
+  color: var(--data-text-primary);
+  font-size: 14px;
+  flex: 1;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.data-grid-export-dropdown {
+  position: relative;
+}
+
+.data-grid-export-menu {
+  position: absolute;
+  top: 100%;
+  right: 0;
+  margin-top: 4px;
+  background-color: var(--data-bg-primary);
+  border: 1px solid var(--data-border-primary);
+  border-radius: 6px;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15), 0 2px 4px rgba(0, 0, 0, 0.1);
+  min-width: 120px;
+  z-index: 1000;
+  overflow: hidden;
+}
+
+.data-grid-export-menu-item {
+  width: 100%;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 8px 12px;
+  background: transparent;
+  border: none;
+  color: var(--data-text-primary);
+  font-size: 14px;
+  text-align: left;
+  transition: background-color 0.2s;
+  cursor: pointer;
+}
+
+.data-grid-export-menu-item:hover {
+  background-color: var(--data-bg-hover);
+}
+
+.data-grid-export-menu-item:not(:last-child) {
+  border-bottom: 1px solid var(--data-border-secondary);
+}
+
+.data-grid-global-search-clear:hover,
+.data-grid-global-search-export:hover {
+  background-color: var(--data-bg-hover);
+  color: var(--data-text-primary);
+}
+
+/* Context Menu */
+.data-grid-context-menu {
+  position: fixed;
+  background-color: var(--data-bg-primary);
+  border: 1px solid var(--data-border-primary);
+  border-radius: 6px;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15), 0 2px 4px rgba(0, 0, 0, 0.1);
+  min-width: 160px;
+  padding: 4px 0;
+  z-index: 10000;
+  overflow: hidden;
+}
+
+.data-grid-context-menu-item {
+  width: 100%;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 8px 12px;
+  border: none;
+  background: transparent;
+  color: var(--data-text-primary);
+  font-size: 13px;
+  text-align: left;
+  transition: background-color 0.15s;
+}
+
+.data-grid-context-menu-item:hover {
+  background-color: var(--data-bg-hover);
+}
+
+.data-grid-context-menu-item svg {
+  flex-shrink: 0;
+  width: 14px;
+  height: 14px;
+}
+
+.data-grid-pagination-page-button.data-grid-pagination-page-button-active {
+  background-color: var(--data-accent);
+  color: #ffffff;
+}
+
+.data-grid-pagination-page-button.data-grid-pagination-page-button-active:hover {
+  background-color: var(--data-accent);
+  opacity: 0.9;
+}
+
+/* Row Animation Styles */
+.data-grid-row-animation .data-grid-row {
+  transition: transform 0.4s, top 0.4s, opacity 0.2s;
+}
+
+.data-grid-row-no-animation .data-grid-row {
+  transition: none;
+}
+
+/* Flex column support */
+.data-grid-cell-flex {
+  flex-shrink: 1;
+}
+
+.data-grid-header-cell-flex {
+  flex-shrink: 1;
+}

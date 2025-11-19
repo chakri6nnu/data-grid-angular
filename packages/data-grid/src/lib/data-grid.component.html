@@ -1,0 +1,1072 @@
+<div
+  *ngIf="!grid || columnsList.length === 0"
+  style="padding: 20px; color: #666"
+>
+  <div *ngIf="columns.length === 0">Waiting for columns...</div>
+  <div *ngIf="columns.length > 0 && !grid">Initializing grid...</div>
+  <div *ngIf="grid && columnsList.length === 0">Loading columns...</div>
+</div>
+<div
+  #container
+  class="data-grid"
+  [ngClass]="[themeClass, animationClass, className]"
+  [ngStyle]="containerStyle"
+  *ngIf="grid && columnsList.length > 0"
+>
+  <!-- Global Search and Export -->
+  <div class="data-grid-search-export-container">
+    <!-- Global Search -->
+    <div
+      *ngIf="enableGlobalSearch"
+      class="data-grid-global-search"
+      [ngClass]="'data-grid-global-search-' + globalSearchPosition"
+    >
+      <input
+        type="text"
+        class="data-grid-global-search-input"
+        [placeholder]="globalSearchPlaceholder"
+        [value]="globalSearchValue"
+        (input)="handleGlobalSearch($any($event.target).value)"
+      />
+      <button
+        *ngIf="globalSearchValue"
+        class="data-grid-global-search-clear"
+        (click)="handleGlobalSearch('')"
+        title="Clear search"
+      >
+        <svg width="14" height="14" viewBox="0 0 14 14" fill="currentColor">
+          <path d="M7 0C3.13 0 0 3.13 0 7s3.13 7 7 7 7-3.13 7-7-3.13-7-7-7zm3.5 5.5L6 10 3.5 7.5l1.41-1.41L6 7.18l3.09-3.09L10.5 5.5z"/>
+        </svg>
+      </button>
+    </div>
+    <!-- Column Visibility Menu -->
+    <div class="data-grid-column-visibility-dropdown">
+      <button
+        class="data-grid-global-search-export"
+        (click)="toggleColumnVisibilityMenu()"
+        title="Column visibility"
+      >
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+          <path d="M2 3h6a4 4 0 0 1 4 4v14a3 3 0 0 0-3-3H2z"/>
+          <path d="M22 3h-6a4 4 0 0 0-4 4v14a3 3 0 0 1 3-3h7z"/>
+        </svg>
+        <svg 
+          *ngIf="!columnVisibilityMenuOpen"
+          width="12" 
+          height="12" 
+          viewBox="0 0 24 24" 
+          fill="none" 
+          stroke="currentColor" 
+          stroke-width="2" 
+          stroke-linecap="round" 
+          stroke-linejoin="round"
+          style="margin-left: 4px;"
+        >
+          <polyline points="6 9 12 15 18 9"/>
+        </svg>
+        <svg 
+          *ngIf="columnVisibilityMenuOpen"
+          width="12" 
+          height="12" 
+          viewBox="0 0 24 24" 
+          fill="none" 
+          stroke="currentColor" 
+          stroke-width="2" 
+          stroke-linecap="round" 
+          stroke-linejoin="round"
+          style="margin-left: 4px;"
+        >
+          <polyline points="18 15 12 9 6 15"/>
+        </svg>
+      </button>
+      <div 
+        *ngIf="columnVisibilityMenuOpen"
+        class="data-grid-column-visibility-menu"
+      >
+        <div class="data-grid-column-visibility-header">Columns</div>
+        <div 
+          *ngFor="let column of columnsList"
+          class="data-grid-column-visibility-item"
+        >
+          <label class="data-grid-column-visibility-checkbox">
+            <input
+              type="checkbox"
+              [checked]="column.visible !== false"
+              (change)="toggleColumnVisibility(column.id, $any($event.target).checked)"
+            />
+            <span>{{ column.headerName || column.id }}</span>
+          </label>
+        </div>
+      </div>
+    </div>
+    <!-- Export Dropdown -->
+    <div class="data-grid-export-dropdown">
+      <button
+        class="data-grid-global-search-export"
+        (click)="toggleExportDropdown()"
+        title="Export data"
+      >
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+          <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/>
+          <polyline points="7 10 12 15 17 10"/>
+          <line x1="12" x2="12" y1="15" y2="3"/>
+        </svg>
+        <svg 
+          *ngIf="!exportDropdownOpen"
+          width="12" 
+          height="12" 
+          viewBox="0 0 24 24" 
+          fill="none" 
+          stroke="currentColor" 
+          stroke-width="2" 
+          stroke-linecap="round" 
+          stroke-linejoin="round"
+          style="margin-left: 4px;"
+        >
+          <polyline points="6 9 12 15 18 9"/>
+        </svg>
+        <svg 
+          *ngIf="exportDropdownOpen"
+          width="12" 
+          height="12" 
+          viewBox="0 0 24 24" 
+          fill="none" 
+          stroke="currentColor" 
+          stroke-width="2" 
+          stroke-linecap="round" 
+          stroke-linejoin="round"
+          style="margin-left: 4px;"
+        >
+          <polyline points="18 15 12 9 6 15"/>
+        </svg>
+      </button>
+      <div 
+        *ngIf="exportDropdownOpen"
+        class="data-grid-export-menu"
+      >
+        <button
+          class="data-grid-export-menu-item"
+          (click)="exportData('xlsx')"
+          title="Export as XLSX"
+        >
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/>
+            <polyline points="14 2 14 8 20 8"/>
+            <line x1="16" x2="8" y1="13" y2="13"/>
+            <line x1="16" x2="8" y1="17" y2="17"/>
+            <polyline points="10 9 9 9 8 9"/>
+          </svg>
+          XLSX
+        </button>
+        <button
+          class="data-grid-export-menu-item"
+          (click)="exportData('csv')"
+          title="Export as CSV"
+        >
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/>
+            <polyline points="14 2 14 8 20 8"/>
+            <line x1="16" x2="8" y1="13" y2="13"/>
+            <line x1="16" x2="8" y1="17" y2="17"/>
+            <polyline points="10 9 9 9 8 9"/>
+          </svg>
+          CSV
+        </button>
+        <button
+          class="data-grid-export-menu-item"
+          (click)="exportData('json')"
+          title="Export as JSON"
+        >
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/>
+            <polyline points="14 2 14 8 20 8"/>
+            <line x1="16" x2="8" y1="13" y2="13"/>
+            <line x1="16" x2="8" y1="17" y2="17"/>
+            <polyline points="10 9 9 9 8 9"/>
+          </svg>
+          JSON
+        </button>
+      </div>
+    </div>
+  </div>
+  <!-- Row Selection Actions -->
+  <div
+    *ngIf="enableSelection"
+    class="data-grid-selection-actions"
+    [class.hidden]="!hasSelectedRows"
+  >
+    <span class="data-grid-selection-actions-text">
+      {{ selectedRowsData.length }} row{{
+        selectedRowsData.length !== 1 ? "s" : ""
+      }}
+      selected
+    </span>
+    <button
+      *ngFor="let button of rowActionButtons"
+      class="data-grid-selection-action-button"
+      [ngClass]="button.class || ''"
+      [class.delete]="button.id === 'delete'"
+      [disabled]="button.disabled"
+      (click)="handleSelectionAction(button.id)"
+      [title]="button.title || button.label"
+    >
+      <span *ngIf="button.icon" [innerHTML]="sanitizeIcon(button.icon)"></span>
+      <svg
+        *ngIf="!button.icon && button.id === 'copy'"
+        width="16"
+        height="16"
+        viewBox="0 0 24 24"
+        fill="none"
+        stroke="currentColor"
+        stroke-width="2"
+        stroke-linecap="round"
+        stroke-linejoin="round"
+      >
+        <rect width="14" height="14" x="8" y="8" rx="2" ry="2"/>
+        <path d="M4 16c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2h8c1.1 0 2 .9 2 2"/>
+      </svg>
+      <svg
+        *ngIf="!button.icon && button.id === 'export'"
+        width="16"
+        height="16"
+        viewBox="0 0 24 24"
+        fill="none"
+        stroke="currentColor"
+        stroke-width="2"
+        stroke-linecap="round"
+        stroke-linejoin="round"
+      >
+        <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/>
+        <polyline points="7 10 12 15 17 10"/>
+        <line x1="12" x2="12" y1="15" y2="3"/>
+      </svg>
+      <svg
+        *ngIf="!button.icon && button.id === 'delete'"
+        width="16"
+        height="16"
+        viewBox="0 0 24 24"
+        fill="none"
+        stroke="currentColor"
+        stroke-width="2"
+        stroke-linecap="round"
+        stroke-linejoin="round"
+      >
+        <path d="M3 6h18"/>
+        <path d="M19 6v14c0 1-1 2-2 2H7c-1 0-2-1-2-2V6"/>
+        <path d="M8 6V4c0-1 1-2 2-2h4c1 0 2 1 2 2v2"/>
+      </svg>
+      {{ button.label }}
+    </button>
+  </div>
+
+  <!-- Header -->
+  <div
+    #header
+    class="data-grid-header"
+    [style.height.px]="headerHeight"
+    [style.overflow-x]="'hidden'"
+  >
+    <div
+      class="data-grid-header-row"
+      [style.width.px]="totalWidth"
+      [style.min-width.px]="totalWidth"
+    >
+      <div
+        *ngFor="let column of displayColumns; trackBy: trackByColumn"
+        class="data-grid-header-cell"
+        [attr.data-menu-column]="column.id"
+        [ngClass]="{
+          'data-grid-header-cell-sortable': column.sortable,
+          'data-grid-header-cell-pinned-left': column.pinned === 'left',
+          'data-grid-header-cell-pinned-right': column.pinned === 'right',
+          'data-grid-header-cell-sorted':
+            getSortState(column.id) === 'asc' ||
+            getSortState(column.id) === 'desc',
+          'data-grid-header-cell-filtered':
+            getFilterCondition(column.id) !== null,
+          'data-grid-header-cell-grouped': getGroupByColumns().includes(
+            column.id
+          ),
+          'data-grid-header-cell-flex': column.hasFlex
+        }"
+        [ngStyle]="
+          column.id === '__checkbox'
+            ? {
+                width: checkboxColumnWidth + 'px',
+                minWidth: checkboxColumnWidth + 'px',
+                maxWidth: checkboxColumnWidth + 'px',
+                flexShrink: 0
+              }
+            : column.id === '__group'
+            ? {
+                width: groupColumnWidth + 'px',
+                minWidth: groupColumnWidth + 'px',
+                maxWidth: groupColumnWidth + 'px',
+                flexShrink: 0
+              }
+            : column.hasFlex
+            ? {
+                flex: column.flex,
+                minWidth: (column.minWidth || 50) + 'px',
+                maxWidth: column.maxWidth || 'none'
+              }
+            : {
+                width: column.width + 'px',
+                minWidth: column.width + 'px',
+                maxWidth: column.width + 'px',
+                flexShrink: 0
+              }
+        "
+      >
+        <!-- Checkbox Column Header -->
+        <ng-container *ngIf="column.id === '__checkbox'">
+          <div
+            class="data-grid-header-content data-grid-header-content-checkbox"
+            style="
+              display: flex;
+              align-items: center;
+              justify-content: center;
+              width: 100%;
+              height: 100%;
+              overflow: hidden;
+            "
+          >
+            <input
+              type="checkbox"
+              [checked]="isAllSelected"
+              (change)="handleSelectAllClick($event)"
+              class="data-grid-checkbox"
+              title="Select all"
+            />
+          </div>
+        </ng-container>
+
+        <!-- Group Column Header -->
+        <ng-container *ngIf="column.id === '__group'">
+          <div
+            class="data-grid-header-content"
+            [style.width.px]="groupColumnWidth"
+            style="flex-shrink: 0"
+          >
+            <span class="data-grid-header-text">Group</span>
+          </div>
+          <!-- Resize Handle for Group Column -->
+          <div
+            class="data-grid-resize-handle"
+            (mousedown)="handleResizeStart(column.id, $event)"
+            title="Drag to resize column"
+          ></div>
+        </ng-container>
+
+          <!-- Regular Column Header -->
+          <ng-container
+            *ngIf="column.id !== '__group' && column.id !== '__checkbox'"
+          >
+            <div
+              class="data-grid-header-content"
+              (click)="column.sortable && handleHeaderClick(column.id)"
+            >
+              <span class="data-grid-header-text">{{ column.headerName }}</span>
+              <!-- Active indicator dot -->
+              <span
+                *ngIf="
+                  getSortState(column.id) !== null ||
+                  getGroupByColumns().includes(column.id) ||
+                  getFilterCondition(column.id) !== null
+                "
+                class="data-grid-header-active-indicator"
+              >
+                <span class="data-grid-header-dot"></span>
+              </span>
+
+            <!-- Filter Indicator -->
+            <span
+              *ngIf="getFilterCondition(column.id) !== null"
+              class="data-grid-filter-indicator"
+              title="Filter applied"
+            >
+              <svg
+                width="12"
+                height="12"
+                viewBox="0 0 12 12"
+                fill="currentColor"
+              >
+                <path d="M2 2h8l-3 4v4l-2-1V6L2 2z" />
+              </svg>
+            </span>
+
+            <!-- Group Indicator -->
+            <span
+              *ngIf="getGroupByColumns().includes(column.id)"
+              class="data-grid-group-indicator"
+              title="Grouped"
+            >
+              <svg
+                width="12"
+                height="12"
+                viewBox="0 0 12 12"
+                fill="currentColor"
+              >
+                <path
+                  d="M2 1h8v2H2V1zm0 3h8v2H2V4zm0 3h8v2H2V7zm0 3h8v2H2v-2z"
+                />
+              </svg>
+            </span>
+
+            <!-- Sort Icon -->
+            <span *ngIf="column.sortable" class="data-grid-sort-icon">
+              <svg
+                *ngIf="getSortState(column.id) === 'asc'"
+                width="12"
+                height="12"
+                viewBox="0 0 12 12"
+                fill="currentColor"
+              >
+                <path d="M6 2L2 6h8L6 2z" />
+                <path d="M6 10L2 6h8L6 10z" opacity="0.3" />
+              </svg>
+              <svg
+                *ngIf="getSortState(column.id) === 'desc'"
+                width="12"
+                height="12"
+                viewBox="0 0 12 12"
+                fill="currentColor"
+              >
+                <path d="M6 2L2 6h8L6 2z" opacity="0.3" />
+                <path d="M6 10L2 6h8L6 10z" />
+              </svg>
+              <svg
+                *ngIf="getSortState(column.id) === null"
+                width="12"
+                height="12"
+                viewBox="0 0 12 12"
+                fill="currentColor"
+                opacity="0.3"
+              >
+                <path d="M6 2L2 6h8L6 2z" />
+                <path d="M6 10L2 6h8L6 10z" />
+              </svg>
+            </span>
+
+            <!-- Menu Button -->
+            <button
+              *ngIf="
+                column.filterable || (enableGrouping && column.enableRowGroup)
+              "
+              data-menu-button
+              class="data-grid-menu-button"
+              (click)="toggleColumnMenu(column.id); $event.stopPropagation()"
+              title="Column menu"
+            >
+              <svg
+                width="12"
+                height="12"
+                viewBox="0 0 12 12"
+                fill="currentColor"
+              >
+                <circle cx="6" cy="2" r="1" />
+                <circle cx="6" cy="6" r="1" />
+                <circle cx="6" cy="10" r="1" />
+              </svg>
+            </button>
+          </div>
+
+          <!-- Resize Handle -->
+          <div
+            *ngIf="column.resizable || column.id === '__group'"
+            class="data-grid-resize-handle"
+            (mousedown)="handleResizeStart(column.id, $event)"
+            title="Drag to resize column"
+          ></div>
+        </ng-container>
+      </div>
+    </div>
+  </div>
+
+  <!-- Column Menu Popover (positioned outside header to avoid scroll issues) -->
+  <div
+    *ngIf="openMenuColumn"
+    class="data-grid-menu-popover"
+    [style.left.px]="getMenuPopoverLeft()"
+    [style.top.px]="getMenuPopoverTop()"
+    (click)="$event.stopPropagation()"
+  >
+    <ng-container *ngFor="let column of displayColumns; trackBy: trackByColumn">
+      <ng-container
+        *ngIf="
+          column.id === openMenuColumn &&
+          column.id !== '__group' &&
+          column.id !== '__checkbox'
+        "
+      >
+        <!-- Filter Section -->
+        <div *ngIf="column.filterable" class="data-grid-menu-section">
+          <div class="data-grid-menu-section-content">
+            <label class="data-grid-menu-label">Filter</label>
+          </div>
+          <div
+            class="data-grid-filter-section"
+            (click)="$event.stopPropagation()"
+            (mousedown)="$event.stopPropagation()"
+            (mouseup)="$event.stopPropagation()"
+          >
+            <div class="data-grid-filter-operator-wrapper">
+              <select
+                class="data-grid-filter-operator-select"
+                [value]="filterOperators.get(column.id) || 'contains'"
+                (change)="
+                  handleFilterOperatorChange(
+                    column.id,
+                    $any($event.target).value,
+                    column.type
+                  )
+                "
+                (click)="$event.stopPropagation()"
+                (mousedown)="$event.stopPropagation()"
+                (mouseup)="$event.stopPropagation()"
+              >
+                <ng-container *ngIf="column.type === 'number'">
+                  <option value="equals">Equals</option>
+                  <option value="greaterThan">Greater Than</option>
+                  <option value="lessThan">Less Than</option>
+                </ng-container>
+                <ng-container *ngIf="column.type !== 'number'">
+                  <option value="contains">Contains</option>
+                  <option value="equals">Equals</option>
+                  <option value="startsWith">Starts With</option>
+                  <option value="endsWith">Ends With</option>
+                </ng-container>
+              </select>
+            </div>
+            <div class="data-grid-filter-input-wrapper">
+              <input
+                [type]="column.type === 'number' ? 'number' : 'text'"
+                class="data-grid-filter-input"
+                placeholder="Filter..."
+                [value]="filterValues.get(column.id) || ''"
+                (input)="
+                  handleFilterChange(
+                    column.id,
+                    $any($event.target).value,
+                    column.type
+                  )
+                "
+                (click)="$event.stopPropagation()"
+                (focus)="$event.stopPropagation()"
+                (mousedown)="$event.stopPropagation()"
+                (mouseup)="$event.stopPropagation()"
+              />
+              <button
+                *ngIf="filterValues.get(column.id)"
+                class="data-grid-filter-clear"
+                (click="
+                  handleFilterClear(column.id); $event.stopPropagation()
+                "
+                title="Clear filter"
+              >
+                <svg
+                  width="12"
+                  height="12"
+                  viewBox="0 0 12 12"
+                  fill="currentColor"
+                >
+                  <path
+                    d="M6 4.586L10.293.293l.707.707L6.707 5.293 12 10.586l-.707.707L6 6.707 1.414 11.293.707 10.586 5.293 6 .293 1.414 1 0.707 6 4.586z"
+                  />
+                </svg>
+              </button>
+            </div>
+          </div>
+        </div>
+
+        <!-- Row Group Section -->
+        <div
+          *ngIf="enableGrouping && column.enableRowGroup"
+          class="data-grid-menu-section"
+        >
+          <div class="data-grid-menu-section-content">
+            <label class="data-grid-menu-label">Row Group</label>
+            <button
+              type="button"
+              class="data-grid-menu-button-item"
+              [ngClass]="{
+                'data-grid-menu-button-item-active':
+                  getGroupByColumns().includes(column.id)
+              }"
+              (mousedown)="$event.stopPropagation()"
+              (click)="
+                toggleGroupingForColumn(column.id);
+                $event.stopPropagation();
+                $event.preventDefault()
+              "
+            >
+              <svg
+                width="12"
+                height="12"
+                viewBox="0 0 12 12"
+                fill="currentColor"
+              >
+                <path
+                  d="M2 1h8v2H2V1zm0 3h8v2H2V4zm0 3h8v2H2V7zm0 3h8v2H2v-2z"
+                />
+              </svg>
+              <span>
+                {{
+                  getGroupByColumns().includes(column.id)
+                    ? "Remove Group"
+                    : "Group by this column"
+                }}
+              </span>
+            </button>
+          </div>
+        </div>
+      </ng-container>
+    </ng-container>
+  </div>
+
+  <!-- Body -->
+  <div
+    #body
+    class="data-grid-body"
+    (scroll)="handleScroll($event)"
+    [style.height.px]="bodyHeight"
+  >
+    <div
+      class="data-grid-body-container"
+      [style.height.px]="totalHeight"
+      [style.width.px]="totalWidth"
+      [style.min-width.px]="totalWidth"
+      [style.padding-top.px]="0"
+    >
+      <ng-container
+        *ngFor="let row of visibleRows; trackBy: trackByRow; let idx = index"
+      >
+        <div
+          *ngIf="!row.isGroupRow"
+          [attr.data-row-index]="row.index"
+          [attr.data-visible-index]="idx"
+          class="data-grid-row"
+          [ngClass]="getRowNgClass(row, idx)"
+          [style.top.px]="
+            (visibleRange?.startIndex || 0) * rowHeight + idx * rowHeight
+          "
+          [style.left.px]="0"
+          [style.width.%]="100"
+          [style.height.px]="rowHeight"
+        >
+          <ng-container
+            *ngFor="let column of displayColumns; trackBy: trackByColumn"
+          >
+            <!-- Checkbox Column Cell -->
+            <ng-container *ngIf="column.id === '__checkbox'">
+              <div
+                class="data-grid-cell"
+                [style.width.px]="checkboxColumnWidth"
+                [style.min-width.px]="checkboxColumnWidth"
+                [style.max-width.px]="checkboxColumnWidth"
+                style="
+                  flex-shrink: 0;
+                  display: flex;
+                  align-items: center;
+                  justify-content: center;
+                "
+                (click)="$event.stopPropagation()"
+              >
+                <input
+                  type="checkbox"
+                  [checked]="row.selected"
+                  [disabled]="!isRowSelectableFn(row, row.index)"
+                  (change)="handleRowCheckboxClick(row.index, $event)"
+                  class="data-grid-checkbox"
+                  [title]="row.selected ? 'Deselect row' : 'Select row'"
+                />
+              </div>
+            </ng-container>
+
+            <!-- Group Column Cell -->
+            <ng-container *ngIf="column.id === '__group'">
+              <div
+                class="data-grid-cell"
+                [style.width.px]="groupColumnWidth"
+                [style.min-width.px]="groupColumnWidth"
+                [style.max-width.px]="groupColumnWidth"
+                style="flex-shrink: 0"
+              ></div>
+            </ng-container>
+
+            <!-- Regular Column Cell -->
+            <ng-container
+              *ngIf="column.id !== '__group' && column.id !== '__checkbox'"
+            >
+              <div
+                class="data-grid-cell"
+                [ngClass]="getCellNgClass(row, column, idx)"
+                [ngStyle]="
+                  column.id === '__group'
+                    ? {
+                        width: groupColumnWidth + 'px',
+                        minWidth: groupColumnWidth + 'px',
+                        maxWidth: groupColumnWidth + 'px',
+                        flexShrink: 0
+                      }
+                    : column.hasFlex
+                    ? {
+                        flex: column.flex,
+                        minWidth: (column.minWidth || 50) + 'px',
+                        maxWidth: column.maxWidth || 'none'
+                      }
+                    : {
+                        width: column.width + 'px',
+                        minWidth: column.width + 'px',
+                        maxWidth: column.width + 'px',
+                        flexShrink: 0
+                      }
+                "
+                (click)="handleCellClick(row, column, idx, $event)"
+                (contextmenu)="handleCellContextMenu(row, column, idx, $event)"
+                (dblclick)="
+                  handleCellDoubleClick(
+                    row.index,
+                    column.id,
+                    getCellValue(row, column)
+                  )
+                "
+              >
+                <!-- Editing Cell -->
+                <input
+                  *ngIf="isEditing(row.index, column.id)"
+                  type="text"
+                  class="data-grid-cell-input"
+                  [value]="editValue"
+                  (input)="editValue = $any($event.target).value"
+                  (keydown)="handleCellEdit($event)"
+                  (blur)="handleCellEditBlur()"
+                  autofocus
+                />
+
+                <!-- Display Cell -->
+                <div
+                  *ngIf="!isEditing(row.index, column.id)"
+                  class="data-grid-cell-content"
+                  style="
+                    display: flex;
+                    align-items: center;
+                    gap: 6px;
+                    width: 100%;
+                  "
+                >
+                  <!-- Icon (left) -->
+                  <span
+                    *ngIf="
+                      getCellIcon(row, column, idx) &&
+                      getCellIconPosition(row, column) !== 'right'
+                    "
+                    class="data-grid-cell-icon"
+                    [innerHTML]="getCellIcon(row, column, idx)"
+                  ></span>
+
+                  <!-- Cell Value -->
+                  <span
+                    class="data-grid-cell-text"
+                    [innerHTML]="
+                      renderCell(getCellValue(row, column), row.data, column)
+                    "
+                  ></span>
+
+                  <!-- Icon (right) -->
+                  <span
+                    *ngIf="
+                      getCellIcon(row, column, idx) &&
+                      getCellIconPosition(row, column) === 'right'
+                    "
+                    class="data-grid-cell-icon"
+                    [innerHTML]="getCellIcon(row, column, idx)"
+                  ></span>
+                </div>
+              </div>
+            </ng-container>
+          </ng-container>
+        </div>
+      </ng-container>
+
+      <!-- Group Rows -->
+      <ng-container
+        *ngFor="let row of visibleRows; trackBy: trackByRow; let idx = index"
+      >
+        <div
+          *ngIf="row.isGroupRow"
+          [attr.data-row-index]="row.index"
+          class="data-grid-group-row"
+          [ngClass]="'data-grid-group-level-' + (row.groupLevel || 0)"
+          [style.top.px]="
+            (visibleRange?.startIndex || 0) * rowHeight + idx * rowHeight
+          "
+          [style.left.px]="0"
+          [style.width.%]="100"
+          [style.height.px]="rowHeight"
+          (click)="toggleGroup(row.groupKey || ''); $event.stopPropagation()"
+          (mouseenter)="
+            hoveredGroupRow = 'group-' + (row.groupKey || '') + '-' + idx
+          "
+          (mouseleave)="hoveredGroupRow = null"
+        >
+          <ng-container
+            *ngFor="let column of displayColumns; trackBy: trackByColumn"
+          >
+            <!-- Checkbox Column Cell for Group Row (empty) -->
+            <ng-container *ngIf="column.id === '__checkbox'">
+              <div
+                class="data-grid-cell"
+                [style.width.px]="checkboxColumnWidth"
+                [style.min-width.px]="checkboxColumnWidth"
+                [style.max-width.px]="checkboxColumnWidth"
+                style="flex-shrink: 0"
+              ></div>
+            </ng-container>
+
+            <ng-container *ngIf="column.id === '__group'">
+              <div
+                class="data-grid-cell"
+                [style.width.px]="groupColumnWidth"
+                [style.min-width.px]="groupColumnWidth"
+                [style.max-width.px]="groupColumnWidth"
+                style="flex-shrink: 0"
+              >
+                <div
+                  *ngIf="(row.groupLevel || 0) > 0"
+                  class="data-grid-group-indent"
+                  [style.width.px]="(row.groupLevel || 0) * 24"
+                ></div>
+                <div class="data-grid-group-toggle">
+                  <span
+                    class="data-grid-group-toggle-icon"
+                    [ngClass]="{
+                      'data-grid-group-toggle-icon-expanded': row.expanded
+                    }"
+                  >
+                    →
+                  </span>
+                </div>
+                <div class="data-grid-group-content">
+                  <span class="data-grid-group-label">{{
+                    getGroupRowValue(row)
+                  }}</span>
+                  <span class="data-grid-group-count"
+                    >({{ getGroupRowCount(row) }})</span
+                  >
+                  <button
+                    *ngIf="
+                      hoveredGroupRow ===
+                        'group-' + (row.groupKey || '') + '-' + idx &&
+                      getGroupByColumns()[row.groupLevel || 0]
+                    "
+                    class="data-grid-clear-group-button"
+                    (click)="
+                      clearGroupingAtLevel(row.groupLevel || 0);
+                      $event.stopPropagation()
+                    "
+                    title="Clear grouping for this column"
+                  >
+                    <svg
+                      width="14"
+                      height="14"
+                      viewBox="0 0 14 14"
+                      fill="currentColor"
+                      style="color: #ef4444"
+                    >
+                      <path
+                        d="M7 6.293L10.293 3l.707.707L7.707 7 11 10.293l-.707.707L7 7.707 3.707 11 3 10.293 6.293 7 3 3.707 3.707 3 7 6.293z"
+                      />
+                    </svg>
+                  </button>
+                </div>
+              </div>
+            </ng-container>
+            <ng-container
+              *ngIf="column.id !== '__group' && column.id !== '__checkbox'"
+            >
+              <div
+                class="data-grid-cell"
+                [ngClass]="{
+                  'data-grid-cell-pinned-left': column.pinned === 'left',
+                  'data-grid-cell-pinned-right': column.pinned === 'right'
+                }"
+                [ngStyle]="
+                  column.id === '__group'
+                    ? {
+                        width: groupColumnWidth + 'px',
+                        minWidth: groupColumnWidth + 'px',
+                        maxWidth: groupColumnWidth + 'px',
+                        flexShrink: 0
+                      }
+                    : column.hasFlex
+                    ? {
+                        flex: column.flex,
+                        minWidth: (column.minWidth || 50) + 'px',
+                        maxWidth: column.maxWidth || 'none'
+                      }
+                    : {
+                        width: column.width + 'px',
+                        minWidth: column.width + 'px',
+                        maxWidth: column.width + 'px',
+                        flexShrink: 0
+                      }
+                "
+              ></div>
+            </ng-container>
+          </ng-container>
+        </div>
+      </ng-container>
+    </div>
+  </div>
+
+  <!-- Pagination -->
+  <div *ngIf="enablePagination && paginationState" class="data-grid-pagination">
+    <div class="data-grid-pagination-page-size">
+      <span class="data-grid-pagination-page-size-label">Items per page:</span>
+      <select
+        class="data-grid-pagination-page-size-select"
+        [value]="paginationState.pageSize"
+        (change)="setPageSize(+$any($event.target).value)"
+      >
+        <option value="10">10</option>
+        <option value="25">25</option>
+        <option value="50">50</option>
+        <option value="100">100</option>
+        <option value="200">200</option>
+      </select>
+    </div>
+    <div class="data-grid-pagination-info">
+      <span>
+        {{ (paginationState.currentPage - 1) * paginationState.pageSize + 1 }} -
+        {{
+          Math.min(
+            paginationState.currentPage * paginationState.pageSize,
+            paginationState.totalItems
+          )
+        }}
+        of {{ paginationState.totalItems }}
+      </span>
+    </div>
+    <div class="data-grid-pagination-nav">
+      <button
+        class="data-grid-pagination-icon-button"
+        (click)="setPage(1)"
+        [disabled]="paginationState.currentPage === 1"
+        title="First page"
+      >
+        <svg width="24" height="24" viewBox="0 0 24 24" fill="currentColor">
+          <path
+            d="M18.41 16.59L13.82 12l4.59-4.59L17 6l-6 6 6 6zM6 6h2v12H6z"
+          />
+        </svg>
+      </button>
+      <button
+        class="data-grid-pagination-icon-button"
+        (click)="setPage(paginationState.currentPage - 1)"
+        [disabled]="paginationState.currentPage === 1"
+        title="Previous page"
+      >
+        <svg width="24" height="24" viewBox="0 0 24 24" fill="currentColor">
+          <path d="M15.41 7.41L14 6l-6 6 6 6 1.41-1.41L10.83 12z" />
+        </svg>
+      </button>
+      <div class="data-grid-pagination-page-numbers">
+        <ng-container
+          *ngFor="let page of getVisiblePageNumbers(); trackBy: trackByPage"
+        >
+          <span *ngIf="page === '...'" class="data-grid-pagination-dots">
+            ...
+          </span>
+          <button
+            *ngIf="page !== '...'"
+            class="data-grid-pagination-page-button"
+            [ngClass]="{
+              'data-grid-pagination-page-button-active':
+                paginationState.currentPage === page
+            }"
+            (click)="handlePageClick(page)"
+          >
+            {{ page }}
+          </button>
+        </ng-container>
+      </div>
+      <button
+        class="data-grid-pagination-icon-button"
+        (click)="setPage(paginationState.currentPage + 1)"
+        [disabled]="paginationState.currentPage === paginationState.totalPages"
+        title="Next page"
+      >
+        <svg width="24" height="24" viewBox="0 0 24 24" fill="currentColor">
+          <path d="M10 6L8.59 7.41 13.17 12l-4.58 4.59L10 18l6-6z" />
+        </svg>
+      </button>
+      <button
+        class="data-grid-pagination-icon-button"
+        (click)="setPage(paginationState.totalPages)"
+        [disabled]="paginationState.currentPage === paginationState.totalPages"
+        title="Last page"
+      >
+        <svg width="24" height="24" viewBox="0 0 24 24" fill="currentColor">
+          <path
+            d="M5.59 7.41L10.18 12l-4.59 4.59L7 18l6-6-6-6zM16 6h2v12h-2z"
+          />
+        </svg>
+      </button>
+    </div>
+  </div>
+
+  <!-- Context Menu -->
+  <div
+    *ngIf="contextMenuVisible && contextMenuRow && contextMenuColumn"
+    class="data-grid-context-menu"
+    [style.left.px]="contextMenuX"
+    [style.top.px]="contextMenuY"
+  >
+    <button
+      class="data-grid-context-menu-item"
+      (click)="handleContextMenuAction('copy')"
+    >
+      <svg width="14" height="14" viewBox="0 0 14 14" fill="currentColor">
+        <path d="M10 0H2C.9 0 0 .9 0 2v8h2V2h8V0zm2 2H4c-.55 0-1 .45-1 1v8c0 .55.45 1 1 1h8c.55 0 1-.45 1-1V3c0-.55-.45-1-1-1z"/>
+      </svg>
+      <span>Copy</span>
+    </button>
+    <button
+      class="data-grid-context-menu-item"
+      (click)="handleContextMenuAction('cut')"
+    >
+      <svg width="14" height="14" viewBox="0 0 14 14" fill="currentColor">
+        <path d="M10 0H2C.9 0 0 .9 0 2v8h2V2h8V0zm2 2H4c-.55 0-1 .45-1 1v8c0 .55.45 1 1 1h8c.55 0 1-.45 1-1V3c0-.55-.45-1-1-1z"/>
+      </svg>
+      <span>Cut</span>
+    </button>
+    <button
+      class="data-grid-context-menu-item"
+      (click)="handleContextMenuAction('paste')"
+    >
+      <svg width="14" height="14" viewBox="0 0 14 14" fill="currentColor">
+        <path d="M10 2H4c-.55 0-1 .45-1 1v8c0 .55.45 1 1 1h6c.55 0 1-.45 1-1V3c0-.55-.45-1-1-1zm0 9H4V3h6v8z"/>
+      </svg>
+      <span>Paste</span>
+    </button>
+    <button
+      class="data-grid-context-menu-item"
+      (click)="handleContextMenuAction('delete')"
+    >
+      <svg width="14" height="14" viewBox="0 0 14 14" fill="currentColor">
+        <path d="M5.5 0L5 1H1v1h12V1H9L8.5 0h-3zM2 3v9c0 1.1.9 2 2 2h6c1.1 0 2-.9 2-2V3H2z"/>
+      </svg>
+      <span>Delete</span>
+    </button>
+    <button
+      class="data-grid-context-menu-item"
+      (click)="handleContextMenuAction('export')"
+    >
+      <svg width="14" height="14" viewBox="0 0 14 14" fill="currentColor">
+        <path d="M7 0L0 3v4c0 4.42 3.58 8 7 8s7-3.58 7-8V3L7 0zm0 2.18l5 1.82v3.64c0 3.31-2.69 6-5 6s-5-2.69-5-6V4l5-1.82z"/>
+      </svg>
+      <span>Export</span>
+    </button>
+  </div>
+</div>
